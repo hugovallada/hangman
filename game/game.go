@@ -52,7 +52,7 @@ func (game *hangmanGame) Play() *hangmanGame {
 			log.Println("Invalid input, please use a single letter.")
 			continue
 		}
-		game.guess().calculateNumberOfFailedTries()
+		game.guess()
 		if game.numberOfFailedTries >= 9 {
 			game.printHangmanState()
 			game.gameOverMessage = fmt.Sprintf("Que pena, voce perdeu... A palavra era %s", game.targetWord)
@@ -95,6 +95,10 @@ func (game *hangmanGame) getGameState() *hangmanGame {
 	return game
 }
 
+func (game *hangmanGame) printGuessedWord() {
+	fmt.Println(game.guessedWord)
+}
+
 func (game *hangmanGame) readInput() *hangmanGame {
 	r := bufio.NewReader(os.Stdin)
 	input, err := r.ReadString('\n')
@@ -105,22 +109,17 @@ func (game *hangmanGame) readInput() *hangmanGame {
 	return game
 }
 
-func (game *hangmanGame) guess() *hangmanGame {
+func (game *hangmanGame) guess() {
 	if game.guessedLetters[game.currentInput] {
 		log.Println("Voce ja tentou essa letra.")
+		return
 	}
 	game.guessedLetters.GuessLetter(game.currentInput)
-	return game
+	game.calculateNumberOfFailedTries()
 }
 
-func (game *hangmanGame) calculateNumberOfFailedTries() *hangmanGame {
+func (game *hangmanGame) calculateNumberOfFailedTries() {
 	if !strings.Contains(game.targetWord, string(game.currentInput)) {
 		game.numberOfFailedTries++
 	}
-	return game
-}
-
-func (game *hangmanGame) printGuessedWord() *hangmanGame {
-	fmt.Println(game.guessedWord)
-	return game
 }
