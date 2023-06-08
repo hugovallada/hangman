@@ -39,10 +39,9 @@ func (game *hangmanGame) Start() *hangmanGame {
 
 func (game *hangmanGame) Play() *hangmanGame {
 	for !game.gameOver {
-		fmt.Print("\n\n")
-		game.printHangmanState()
-		game.getGameState()
-		fmt.Println(game.guessedWord)
+		game.printHangmanState().
+			getGameState().
+			printGuessedWord()
 		if game.guessedWord == game.targetWord {
 			game.gameOverMessage = "Parabens, voce venceu!"
 			game.gameOver = true
@@ -70,16 +69,18 @@ func (game *hangmanGame) GameOver() {
 	}
 }
 
-func (game *hangmanGame) printHangmanState() {
+func (game *hangmanGame) printHangmanState() *hangmanGame {
 	file, err := os.ReadFile(fmt.Sprintf("./states/hangman%d.txt", game.numberOfFailedTries))
 	if err != nil {
 		game.gameOverMessage = err.Error()
 		game.gameOver = true
 	}
+	fmt.Print("\n\n")
 	fmt.Println(string(file))
+	return game
 }
 
-func (game *hangmanGame) getGameState() {
+func (game *hangmanGame) getGameState() *hangmanGame {
 	result := ""
 	for _, letter := range game.targetWord {
 		if letter == ' ' {
@@ -91,15 +92,17 @@ func (game *hangmanGame) getGameState() {
 		}
 	}
 	game.guessedWord = result
+	return game
 }
 
-func (game *hangmanGame) readInput() {
+func (game *hangmanGame) readInput() *hangmanGame {
 	r := bufio.NewReader(os.Stdin)
 	input, err := r.ReadString('\n')
 	if err != nil || len(input) != 1 {
 		game.currentInput = rune(1)
 	}
 	game.currentInput = []rune(input)[0]
+	return game
 }
 
 func (game *hangmanGame) guess() *hangmanGame {
@@ -110,8 +113,14 @@ func (game *hangmanGame) guess() *hangmanGame {
 	return game
 }
 
-func (game *hangmanGame) calculateNumberOfFailedTries() {
+func (game *hangmanGame) calculateNumberOfFailedTries() *hangmanGame {
 	if !strings.Contains(game.targetWord, string(game.currentInput)) {
 		game.numberOfFailedTries++
 	}
+	return game
+}
+
+func (game *hangmanGame) printGuessedWord() *hangmanGame {
+	fmt.Println(game.guessedWord)
+	return game
 }
